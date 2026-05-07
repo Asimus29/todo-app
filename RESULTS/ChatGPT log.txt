@@ -1,0 +1,1464 @@
+ПОЧАТОК ЧАТУ
+
+-----------------------------------------------------------
+User: Мені необхідно виконати завдання.
+
+Завдання: створити базовий веб-додаток "ToDo List".
+Можливості:
+      1. Додавати завдання.
+      2. Відмічати завдання як виконані.
+      3. Видаляти завдання.
+Вимоги базового рівня:
+      - Додаток має включати тільки frontend.
+      - Завдання повинні зберігатися у localStorage браузера.
+      - Використовуйте ШІ для генерації коду необхідних модулів.
+      - Проаналізуйте відповіді ШІ, адаптуйте та інтегруйте отримані частини в проєкт.
+Вимоги просунутого рівня:
+      - До додатку з базового рівня розробіть backend частину.
+      - Зберігання завдань повинно відбуватися не у localStorage браузера, а у файловій системі сервера.
+
+Почнемо з базового рівня.
+
+
+ChatGPT:
+Чудово. Для базового рівня найкраще зробити простий frontend-проєкт на чистих HTML/CSS/JavaScript без фреймворків — це добре показує розуміння основ.
+
+Структура проєкту буде такою:
+
+```text
+todo-app/
+│
+├── index.html
+├── style.css
+└── script.js
+```
+
+---
+
+# 1. `index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>ToDo List</h1>
+
+        <div class="todo-input">
+            <input type="text" id="taskInput" placeholder="Введіть завдання...">
+            <button id="addTaskBtn">Додати</button>
+        </div>
+
+        <ul id="taskList"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+```
+
+---
+
+# 2. `style.css`
+
+```css
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.container {
+    width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+}
+
+.todo-input {
+    display: flex;
+    gap: 10px;
+}
+
+.todo-input input {
+    flex: 1;
+    padding: 10px;
+}
+
+.todo-input button {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background: #eee;
+    border-radius: 5px;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.task-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.complete-btn {
+    background: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+```
+
+---
+
+# 3. `script.js`
+
+```javascript
+const taskInput = document.getElementById("taskInput");
+const addTaskBtn = document.getElementById("addTaskBtn");
+const taskList = document.getElementById("taskList");
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+// Завантаження задач при старті
+renderTasks();
+
+// Додавання задачі
+addTaskBtn.addEventListener("click", () => {
+    const taskText = taskInput.value.trim();
+
+    if (taskText === "") {
+        alert("Введіть завдання!");
+        return;
+    }
+
+    const task = {
+        id: Date.now(),
+        text: taskText,
+        completed: false
+    };
+
+    tasks.push(task);
+
+    saveTasks();
+    renderTasks();
+
+    taskInput.value = "";
+});
+
+// Збереження у localStorage
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Відображення задач
+function renderTasks() {
+    taskList.innerHTML = "";
+
+    tasks.forEach(task => {
+        const li = document.createElement("li");
+
+        if (task.completed) {
+            li.classList.add("completed");
+        }
+
+        li.innerHTML = `
+            <span>${task.text}</span>
+
+            <div class="task-buttons">
+                <button class="complete-btn">
+                    ${task.completed ? "Скасувати" : "Виконано"}
+                </button>
+
+                <button class="delete-btn">
+                    Видалити
+                </button>
+            </div>
+        `;
+
+        // Кнопка виконання
+        li.querySelector(".complete-btn")
+            .addEventListener("click", () => {
+                task.completed = !task.completed;
+
+                saveTasks();
+                renderTasks();
+            });
+
+        // Кнопка видалення
+        li.querySelector(".delete-btn")
+            .addEventListener("click", () => {
+                tasks = tasks.filter(t => t.id !== task.id);
+
+                saveTasks();
+                renderTasks();
+            });
+
+        taskList.appendChild(li);
+    });
+}
+```
+
+---
+
+# Як запустити
+
+1. Створіть папку `todo-app`
+2. Додайте туди 3 файли:
+
+   * `index.html`
+   * `style.css`
+   * `script.js`
+3. Відкрийте `index.html` у браузері
+
+---
+
+# Що реалізовано
+
+## Базові вимоги
+
+✅ Додавання завдань
+✅ Відмітка виконаних
+✅ Видалення
+✅ Збереження у `localStorage`
+✅ Тільки frontend
+✅ Код згенерований та адаптований ШІ
+
+---
+
+# Що можна сказати при захисті роботи
+
+Можеш пояснити так:
+
+* Дані зберігаються у `localStorage` браузера через:
+
+  ```javascript
+  localStorage.setItem()
+  localStorage.getItem()
+  ```
+
+* Для оновлення інтерфейсу використовується функція `renderTasks()`.
+
+* Стан задач зберігається у масиві `tasks`.
+
+* Для кожної задачі створюються:
+
+  * кнопка виконання;
+  * кнопка видалення.
+
+* Після будь-якої зміни викликаються:
+
+  ```javascript
+  saveTasks();
+  renderTasks();
+  ```
+
+---
+
+# Що можна покращити (як бонус)
+
+Можеш додати:
+
+* фільтрацію задач;
+* темну тему;
+* редагування задач;
+* анімації;
+* Enter для швидкого додавання;
+* адаптивність під телефон.
+
+---
+
+Коли завершиш базовий рівень — можемо перейти до просунутого:
+
+* Node.js + Express backend;
+* збереження у JSON-файл;
+* REST API;
+* frontend + backend взаємодія.
+
+-----------------------------------------------------------
+User: (додано зображення UI сайту)
+Добре. Задачі додаються, видаляються, при натисканні "виконано" - перекреслюються. При спробі додавання пустого завдання - висвітлюється діалогове вікно "Введіть завдання!". При оновленні задачі зберігаються. Базові вимоги виконані.
+Перед тим як перейдемо до просунутого рівня, зробимо трохи редизайну. Загалом нормально, але хотілося би більш стилю.
+
+
+ChatGPT: Можемо зробити сучасний мінімалістичний дизайн у стилі glassmorphism / modern dark UI — без ускладнення логіки.
+
+Онови тільки `style.css` на цей варіант:
+
+```css id="9kk4nd"
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a,
+            #111827,
+            #1e293b
+        );
+
+    color: white;
+}
+
+.container {
+    width: 450px;
+
+    padding: 30px;
+
+    border-radius: 24px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35);
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+h1 {
+    text-align: center;
+
+    margin-bottom: 25px;
+
+    font-size: 42px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+.todo-input {
+    display: flex;
+    gap: 12px;
+
+    margin-bottom: 25px;
+}
+
+.todo-input input {
+    flex: 1;
+
+    padding: 14px 16px;
+
+    border: none;
+    outline: none;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.08);
+
+    color: white;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+}
+
+.todo-input input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.todo-input input:focus {
+    background: rgba(255,255,255,0.12);
+
+    box-shadow:
+        0 0 0 2px rgba(99,102,241,0.4);
+}
+
+.todo-input button {
+    border: none;
+
+    padding: 14px 20px;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: white;
+
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #8b5cf6
+    );
+
+    transition: 0.25s;
+}
+
+.todo-input button:hover {
+    transform: translateY(-2px);
+
+    opacity: 0.95;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px;
+
+    margin-bottom: 14px;
+
+    border-radius: 16px;
+
+    background: rgba(255,255,255,0.06);
+
+    animation: fadeIn 0.3s ease;
+}
+
+.task-text {
+    font-size: 17px;
+
+    word-break: break-word;
+
+    max-width: 220px;
+}
+
+.completed .task-text {
+    text-decoration: line-through;
+
+    opacity: 0.5;
+}
+
+.task-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.task-buttons button {
+    border: none;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-weight: 600;
+
+    transition: 0.25s;
+}
+
+.complete-btn {
+    background: linear-gradient(
+        135deg,
+        #10b981,
+        #059669
+    );
+}
+
+.delete-btn {
+    background: linear-gradient(
+        135deg,
+        #ef4444,
+        #dc2626
+    );
+}
+
+.task-buttons button:hover {
+    transform: scale(1.05);
+
+    opacity: 0.95;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+```
+
+---
+
+І ще невелике оновлення в `script.js`.
+
+Заміни:
+
+```javascript
+<span>${task.text}</span>
+```
+
+на:
+
+```javascript
+<span class="task-text">${task.text}</span>
+```
+
+---
+
+Що зміниться:
+
+✅ сучасний dark UI
+✅ glassmorphism ефект
+✅ плавні hover-анімації
+✅ красиві кнопки
+✅ адаптивні відступи
+✅ акуратні task cards
+✅ більш професійний вигляд
+
+---
+
+Можна ще додати:
+
+* Enter для додавання задач;
+* лічильник задач;
+* фільтри ALL / DONE / ACTIVE;
+* кастомне модальне вікно замість `alert`;
+* drag & drop;
+* light/dark switch.
+
+Після редизайну можемо переходити до backend-версії на Node.js + Express.
+
+
+-----------------------------------------------------------
+User: (додано скрін оновленого UI)
+Гарно, так і залишаємо.
+Тепер бекєнд. Node.js вже встановлений. Пропиши порядок дій.
+
+
+ChatGPT: Супер. Тепер зробимо просунутий рівень правильно: frontend + backend на Node.js + Express із збереженням задач у JSON-файл на сервері.
+
+---
+
+# Що буде в результаті
+
+Твій проєкт матиме:
+
+✅ frontend (HTML/CSS/JS)
+✅ backend на Node.js
+✅ Express сервер
+✅ REST API
+✅ збереження задач у файл `tasks.json`
+✅ читання задач із сервера
+✅ додавання / видалення / оновлення через backend
+
+---
+
+# Нова структура проєкту
+
+```text id="w5k1ye"
+todo-app/
+│
+├── public/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── tasks.json
+├── server.js
+├── package.json
+```
+
+---
+
+# КРОК 1. Перемістити frontend у `public`
+
+Створи папку:
+
+```bash id="fjlwm2"
+public
+```
+
+І перенеси туди:
+
+* `index.html`
+* `style.css`
+* `script.js`
+
+---
+
+# КРОК 2. Ініціалізація Node.js
+
+У терміналі відкрий папку проєкту:
+
+```bash id="9jt5e3"
+cd todo-app
+```
+
+І виконай:
+
+```bash id="m6cl4q"
+npm init -y
+```
+
+З’явиться `package.json`.
+
+---
+
+# КРОК 3. Встановити Express
+
+```bash id="75nqcb"
+npm install express
+```
+
+---
+
+# КРОК 4. Створити `tasks.json`
+
+У корені проєкту створи файл:
+
+```json id="v9ul3m"
+[]
+```
+
+Це буде наша "база даних".
+
+---
+
+# КРОК 5. Створити `server.js`
+
+```javascript id="6yx0kp"
+const express = require("express");
+const fs = require("fs");
+
+const app = express();
+
+const PORT = 3000;
+
+app.use(express.json());
+app.use(express.static("public"));
+
+const TASKS_FILE = "tasks.json";
+
+// Отримати всі задачі
+app.get("/tasks", (req, res) => {
+    fs.readFile(TASKS_FILE, "utf8", (err, data) => {
+
+        if (err) {
+            return res.status(500).json({
+                error: "Помилка читання файлу"
+            });
+        }
+
+        res.json(JSON.parse(data));
+    });
+});
+
+// Зберегти всі задачі
+app.post("/tasks", (req, res) => {
+
+    const tasks = req.body;
+
+    fs.writeFile(
+        TASKS_FILE,
+        JSON.stringify(tasks, null, 2),
+        err => {
+
+            if (err) {
+                return res.status(500).json({
+                    error: "Помилка запису файлу"
+                });
+            }
+
+            res.json({
+                message: "Задачі збережено"
+            });
+        }
+    );
+});
+
+app.listen(PORT, () => {
+    console.log(
+        `Server running on http://localhost:${PORT}`
+    );
+});
+```
+
+---
+
+# Що робить backend
+
+## GET `/tasks`
+
+Повертає всі задачі:
+
+```javascript id="l7nk0u"
+app.get("/tasks")
+```
+
+---
+
+## POST `/tasks`
+
+Записує задачі у файл:
+
+```javascript id="n4n13r"
+app.post("/tasks")
+```
+
+---
+
+# КРОК 6. Оновити `script.js`
+
+Тепер `localStorage` більше НЕ використовуємо.
+
+Повністю заміни `script.js`:
+
+```javascript id="sxllzh"
+const taskInput = document.getElementById("taskInput");
+const addTaskBtn = document.getElementById("addTaskBtn");
+const taskList = document.getElementById("taskList");
+
+let tasks = [];
+
+// Завантаження задач із сервера
+async function loadTasks() {
+
+    const response = await fetch("/tasks");
+
+    tasks = await response.json();
+
+    renderTasks();
+}
+
+// Збереження задач на сервер
+async function saveTasks() {
+
+    await fetch("/tasks", {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(tasks)
+    });
+}
+
+// Додавання задачі
+addTaskBtn.addEventListener("click", async () => {
+
+    const taskText = taskInput.value.trim();
+
+    if (taskText === "") {
+        alert("Введіть завдання!");
+        return;
+    }
+
+    const task = {
+        id: Date.now(),
+        text: taskText,
+        completed: false
+    };
+
+    tasks.push(task);
+
+    await saveTasks();
+
+    renderTasks();
+
+    taskInput.value = "";
+});
+
+// Відображення задач
+function renderTasks() {
+
+    taskList.innerHTML = "";
+
+    tasks.forEach(task => {
+
+        const li = document.createElement("li");
+
+        if (task.completed) {
+            li.classList.add("completed");
+        }
+
+        li.innerHTML = `
+            <span class="task-text">
+                ${task.text}
+            </span>
+
+            <div class="task-buttons">
+
+                <button class="complete-btn">
+                    ${task.completed
+                        ? "Скасувати"
+                        : "Виконано"}
+                </button>
+
+                <button class="delete-btn">
+                    Видалити
+                </button>
+
+            </div>
+        `;
+
+        // Виконано
+        li.querySelector(".complete-btn")
+            .addEventListener("click", async () => {
+
+                task.completed = !task.completed;
+
+                await saveTasks();
+
+                renderTasks();
+            });
+
+        // Видалити
+        li.querySelector(".delete-btn")
+            .addEventListener("click", async () => {
+
+                tasks = tasks.filter(
+                    t => t.id !== task.id
+                );
+
+                await saveTasks();
+
+                renderTasks();
+            });
+
+        taskList.appendChild(li);
+    });
+}
+
+// Старт
+loadTasks();
+```
+
+---
+
+# КРОК 7. Запуск сервера
+
+У терміналі:
+
+```bash id="olhnm8"
+node server.js
+```
+
+Повинно з’явитись:
+
+```bash id="apmhh7"
+Server running on http://localhost:3000
+```
+
+---
+
+# КРОК 8. Відкрити у браузері
+
+Тепер НЕ відкриваємо `index.html` напряму.
+
+Відкрий:
+
+```text id="o7p01w"
+http://localhost:3000
+```
+
+---
+
+# Як перевірити
+
+## Додавання задач
+
+Після додавання:
+
+* дані записуються у `tasks.json`.
+
+---
+
+## Перезапуск сервера
+
+Навіть після:
+
+* закриття браузера;
+* перезапуску сервера;
+
+задачі залишаться.
+
+---
+
+# Що сказати при захисті
+
+## Чому вже не localStorage?
+
+Бо:
+
+* localStorage працює тільки у браузері;
+* дані прив’язані до конкретного користувача;
+* backend дозволяє централізоване збереження.
+
+---
+
+## Як працює backend?
+
+Frontend надсилає HTTP-запити:
+
+### Отримання задач:
+
+```javascript id="n8y3mg"
+fetch("/tasks")
+```
+
+### Збереження задач:
+
+```javascript id="9v9gmx"
+fetch("/tasks", {
+    method: "POST"
+})
+```
+
+---
+
+## Де зберігаються дані?
+
+У:
+
+```text id="pv6j96"
+tasks.json
+```
+
+---
+
+# Що можна ще покращити
+
+Після цього можна легко перейти на:
+
+* MongoDB;
+* PostgreSQL;
+* авторизацію;
+* Docker;
+* React;
+* WebSocket;
+* деплой.
+
+Але для навчального завдання цього вже більш ніж достатньо.
+
+
+-----------------------------------------------------------
+User: Всі кроки виконані, але проблема: при додаванні завдань, задачі не показуються на сайті, а також не додаються в tasks.json. 
+
+
+ChatGPT: Швидше за все проблема в одному з трьох місць:
+
+1. сервер не отримує JSON;
+2. `fetch()` падає;
+3. браузер відкритий не через `localhost:3000`.
+
+Давай перевіримо по порядку.
+
+---
+
+# 1. Перевір `server.js`
+
+У тебе ОБОВ’ЯЗКОВО має бути:
+
+```javascript id="mdz7fy"
+app.use(express.json());
+```
+
+і воно повинно стояти ДО:
+
+```javascript id="g4z5en"
+app.post("/tasks", ...)
+```
+
+Повний порядок:
+
+```javascript id="l5b7wj"
+const express = require("express");
+const fs = require("fs");
+
+const app = express();
+
+app.use(express.json());
+app.use(express.static("public"));
+```
+
+---
+
+# 2. Перевір `tasks.json`
+
+Файл має містити:
+
+```json id="fy49tt"
+[]
+```
+
+НЕ порожній файл.
+
+---
+
+# 3. Найважливіше — як ти відкриваєш сайт
+
+Потрібно відкривати:
+
+```text id="d9shqj"
+http://localhost:3000
+```
+
+А НЕ:
+
+```text id="c8pprk"
+file:///...
+```
+
+---
+
+# 4. Відкрий DevTools
+
+Натисни:
+
+```text id="n0q9eu"
+F12 → Console
+```
+
+і подивись чи є помилки.
+
+---
+
+# 5. Додай логування
+
+Замінити `POST /tasks` на:
+
+```javascript id="9w3gfo"
+app.post("/tasks", (req, res) => {
+
+    console.log(req.body);
+
+    const tasks = req.body;
+
+    fs.writeFile(
+        TASKS_FILE,
+        JSON.stringify(tasks, null, 2),
+        err => {
+
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    error: "Помилка запису файлу"
+                });
+            }
+
+            console.log("Tasks saved");
+
+            res.json({
+                message: "Задачі збережено"
+            });
+        }
+    );
+});
+```
+
+---
+
+# 6. Перезапусти сервер
+
+Після змін:
+
+```bash id="3kttii"
+CTRL + C
+```
+
+потім:
+
+```bash id="f6l4yv"
+node server.js
+```
+
+---
+
+# 7. Перевір Network
+
+В DevTools:
+
+```text id="3gr35e"
+F12 → Network → Fetch/XHR
+```
+
+При додаванні задачі має бути:
+
+```text id="kxyw5d"
+POST /tasks
+```
+
+зі статусом:
+
+```text id="o1rj5g"
+200 OK
+```
+
+---
+
+# 8. Найімовірніша причина
+
+У тебе може бути така проблема:
+
+```javascript id="g67ceh"
+await saveTasks();
+
+renderTasks();
+```
+
+Якщо `saveTasks()` падає — `renderTasks()` не викликається.
+
+Тому тимчасово заміни:
+
+```javascript id="t6sqra"
+await saveTasks();
+```
+
+на:
+
+```javascript id="ij6x5r"
+try {
+    await saveTasks();
+} catch(error) {
+    console.error(error);
+}
+```
+
+---
+
+# 9. Оновлена безпечна версія
+
+У `addTaskBtn`:
+
+```javascript id="0fx40o"
+tasks.push(task);
+
+try {
+    await saveTasks();
+} catch(error) {
+    console.error(error);
+}
+
+renderTasks();
+```
+
+---
+
+# 10. Якщо не допоможе
+
+Надішли:
+
+* `server.js`
+* `script.js`
+* помилку з Console
+
+і я відразу знайду проблему.
+
+-----------------------------------------------------------
+User: Так, проблема було в не пустому файлі tasks.json.
+
+Тепер завантажимо все це на Гітхаб. Теж з порядком дій. Аккаунт та Git вже є.
+
+
+СhatGPT: Чудово. Тепер зробимо нормальний GitHub-репозиторій для здачі роботи.
+
+---
+
+# КРОК 1. Перевір структуру проєкту
+
+У тебе має бути приблизно так:
+
+```text id="53cly0"
+todo-app/
+│
+├── node_modules/
+├── public/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── tasks.json
+├── server.js
+├── package.json
+├── package-lock.json
+```
+
+---
+
+# КРОК 2. Створити `.gitignore`
+
+У корені проєкту створи файл:
+
+```text id="7r9r8i"
+.gitignore
+```
+
+Встав:
+
+```gitignore id="3d2w97"
+node_modules
+```
+
+---
+
+# Навіщо `.gitignore`
+
+Щоб НЕ завантажувати:
+
+```text id="vf6vmu"
+node_modules/
+```
+
+Бо:
+
+* папка величезна;
+* залежності встановлюються через `npm install`.
+
+---
+
+# КРОК 3. Ініціалізувати Git
+
+У терміналі:
+
+```bash id="0m4vw6"
+git init
+```
+
+---
+
+# КРОК 4. Додати файли
+
+```bash id="p4u3ax"
+git add .
+```
+
+---
+
+# КРОК 5. Зробити перший commit
+
+```bash id="bppgjm"
+git commit -m "Initial commit"
+```
+
+---
+
+# КРОК 6. Створити репозиторій на GitHub
+
+Відкрий:
+
+[GitHub](https://github.com?utm_source=chatgpt.com)
+
+---
+
+## Далі:
+
+1. Натисни:
+
+```text id="5hl4lt"
+New repository
+```
+
+2. Назва:
+
+```text id="jlwm8u"
+todo-app
+```
+
+3. Обери:
+
+```text id="6wnkk0"
+Public
+```
+
+4. НЕ став галочки:
+
+* README
+* .gitignore
+* License
+
+5. Натисни:
+
+```text id="b3x5ea"
+Create repository
+```
+
+---
+
+# КРОК 7. Підключити локальний проєкт до GitHub
+
+GitHub покаже команди.
+
+Буде приблизно так:
+
+```bash id="w2nspw"
+git remote add origin https://github.com/USERNAME/todo-app.git
+```
+
+Виконай її.
+
+---
+
+# КРОК 8. Відправити код на GitHub
+
+```bash id="4kk5px"
+git branch -M main
+```
+
+Потім:
+
+```bash id="g6pw4i"
+git push -u origin main
+```
+
+---
+
+# КРОК 9. Оновити сторінку GitHub
+
+І побачиш свій проєкт онлайн.
+
+---
+
+# КРОК 10. README (рекомендую)
+
+Створи:
+
+```text id="2e2oxv"
+README.md
+```
+
+І встав:
+
+````markdown id="jlwm7n"
+# ToDo List App
+
+Простий ToDo List веб-додаток.
+
+## Функціонал
+
+- Додавання задач
+- Видалення задач
+- Позначення виконаних задач
+- Збереження задач на сервері
+
+## Технології
+
+- HTML
+- CSS
+- JavaScript
+- Node.js
+- Express
+
+## Запуск проєкту
+
+```bash
+npm install
+node server.js
+```
+
+Після запуску:
+
+```text
+http://localhost:3000
+```
+````
+
+---
+
+# Після README
+
+Ще раз:
+
+```bash id="j0jprg"
+git add .
+git commit -m "Add README"
+git push
+```
+
+---
+
+# Як потім оновлювати GitHub
+
+Після будь-яких змін:
+
+```bash id="o5m5r4"
+git add .
+git commit -m "опис змін"
+git push
+```
+
+---
+
+# Що сказати при захисті
+
+✅ Git використовувався для контролю версій
+✅ Проєкт розміщений на GitHub
+✅ Backend реалізований через Node.js + Express
+✅ Дані зберігаються у файловій системі сервера
+✅ Frontend взаємодіє з backend через Fetch API
+
+---
+
+# Бонус (дуже рекомендую)
+
+Можеш ще:
+
+* додати скріншот у README;
+* задеплоїти на Render/Vercel;
+* зробити live demo.
+
+Для студентського проєкту це вже виглядатиме дуже сильно.
+-----------------------------------------------------------
+
+КІНЕЦЬ ЧАТУ
